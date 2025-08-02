@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدعم الذكي - تطبيق تنظيم المذاكرة والوقت</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header-bg {
+            background: linear-gradient(rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23f3f4f6;stop-opacity:0.3" /><stop offset="100%" style="stop-color:%23e5e7eb;stop-opacity:0.3" /></linearGradient></defs><rect width="1200" height="600" fill="url(%23grad1)"/><g fill="rgba(255,255,255,0.1)"><circle cx="200" cy="150" r="80"/><circle cx="400" cy="300" r="60"/><circle cx="800" cy="200" r="90"/><circle cx="1000" cy="400" r="70"/><rect x="300" y="100" width="120" height="80" rx="10"/><rect x="600" y="250" width="150" height="100" rx="15"/><rect x="100" y="350" width="100" height="60" rx="8"/><path d="M50,50 Q100,20 150,50 T250,50" stroke="rgba(255,255,255,0.2)" stroke-width="3" fill="none"/><path d="M500,100 Q550,70 600,100 T700,100" stroke="rgba(255,255,255,0.2)" stroke-width="3" fill="none"/></g><text x="600" y="500" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="40" font-family="Arial">📚 الدراسة والنجاح 📚</text></svg>');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #ffecd2, #fcb69f);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            color: #8b4513;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: #8b0000;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 12px 12px 0 0;
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 4px;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .prayer-time {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 2px;
+            display: inline-block;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .section-title {
+            color: #4a5568;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+        
+        table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .dua-text {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .charity-text {
+            background: rgba(254, 215, 170, 0.9);
+            border-radius: 12px;
+            padding: 12px;
+            color: #8b4513;
+            font-weight: 600;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .developer-text {
+            background: rgba(209, 250, 229, 0.9);
+            border-radius: 10px;
+            padding: 8px;
+            color: #047857;
+            font-weight: 500;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .time-period {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 5px;
+            display: inline-block;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                margin: 10px 0;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold mb-2">الدعم الذكي</h1>
+                <p class="text-xl mb-4">تنظيم المذاكرة والوقت لطلاب الثانوية العامة المصرية</p>
+                
+                <!-- Prayer -->
+                <div class="dua-text">
+                    اللهم لا سهل إلا ما جعلته سهلا وأنت تجعل الحزن إن شئت سهلا، اللهم اشرح لي صدري ويسر لي أمري واحلل عقدة من لساني يفقهوا قولي، اللهم افتح علي فتوح العارفين بفضلك
+                </div>
+                
+                <!-- User Section -->
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <div class="text-center">
+                        <input type="file" id="avatarInput" accept="image/*" class="hidden">
+                        <img id="userAvatar" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23667eea'/><circle cx='50' cy='35' r='15' fill='white'/><path d='M30 65 Q50 45 70 65 L70 100 L30 100 Z' fill='white'/></svg>" alt="صورة المستخدم" class="user-avatar" onclick="document.getElementById('avatarInput').click()">
+                        <p class="text-sm mt-2">اضغط لتغيير الصورة</p>
+                    </div>
+                    <div>
+                        <input type="text" id="userName" placeholder="أدخل اسمك" class="input-field text-center text-gray-800">
+                        <p class="text-sm mt-2">مرحباً <span id="displayName">طالب/ة</span></p>
+                    </div>
+                </div>
+                
+                <!-- Charity Text -->
+                <div class="charity-text">
+                    <strong>صدقة جارية</strong><br>
+                    أسألكم الدعاء لي ولوالدي وأولادي بصالح الأعمال
+                </div>
+                
+                <!-- Developer Text -->
+                <div class="developer-text">
+                    تم التطوير بواسطة المطور: سيد أمين
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center mb-6">
+            <button class="tab-button active" onclick="showSection('dashboard')">
+                <i class="fas fa-home ml-2"></i>الرئيسية
+            </button>
+            <button class="tab-button" onclick="showSection('subjects')">
+                <i class="fas fa-book ml-2"></i>المواد الدراسية
+            </button>
+            <button class="tab-button" onclick="showSection('schedule')">
+                <i class="fas fa-calendar-alt ml-2"></i>جداول المذاكرة
+            </button>
+            <button class="tab-button" onclick="showSection('lessons')">
+                <i class="fas fa-chalkboard-teacher ml-2"></i>الدروس الخصوصية
+            </button>
+            <button class="tab-button" onclick="showSection('timeManagement')">
+                <i class="fas fa-clock ml-2"></i>إدارة الوقت
+            </button>
+            <button class="tab-button" onclick="showSection('links')">
+                <i class="fas fa-link ml-2"></i>المواقع التعليمية
+            </button>
+            <button class="tab-button" onclick="showSection('books')">
+                <i class="fas fa-book-open ml-2"></i>الكتب
+            </button>
+            <button class="tab-button" onclick="showSection('reports')">
+                <i class="fas fa-chart-bar ml-2"></i>التقارير
+            </button>
+            <button class="tab-button" onclick="showSection('achievements')">
+                <i class="fas fa-trophy ml-2"></i>ملف الإنجاز
+            </button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section">
+            <div class="card p-6">
+                <h2 class="section-title">لوحة التحكم الرئيسية</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Prayer Times -->
+                    <div class="card p-4">
+                        <h3 class="text-xl font-bold mb-4 text-center">أوقات الصلاة</h3>
+                        <div class="space-y-3">
+                            <div class="prayer-time">
+                                <i class="fas fa-sun ml-2"></i>الفجر: 04:30
+                            </div>
+                            <div class="prayer-time">
+                                <i class="fas fa-sun ml-2"></i>الضحى: 06:00
+                            </div>
+                            <div class="prayer-time">
+                                <i class="fas fa-sun ml-2"></i>الظهر: 12:15
+                            </div>
+                            <div class="prayer-time">
+                                <i class="fas fa-sun ml-2"></i>العصر: 15:45
+                            </div>
+                            <div class="prayer-time">
+                                <i class="fas fa-moon ml-2"></i>المغرب: 18:30
+                            </div>
+                            <div class="prayer-time">
+                                <i class="fas fa-moon ml-2"></i>العشاء: 20:00
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Today's Schedule -->
+                    <div class="card p-4">
+                        <h3 class="text-xl font-bold mb-4 text-center">جدول اليوم</h3>
+                        <div id="todaySchedule" class="space-y-2">
+                            <p class="text-gray-600 text-center">لا توجد مهام اليوم</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="card p-4">
+                        <h3 class="text-xl font-bold mb-4 text-center">الإحصائيات السريعة</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span>المواد المضافة:</span>
+                                <span id="subjectsCount" class="achievement-badge">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>الدروس المجدولة:</span>
+                                <span id="lessonsCount" class="achievement-badge">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>ساعات المذاكرة:</span>
+                                <span id="studyHours" class="achievement-badge">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects Section -->
+        <div id="subjects" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">إدارة المواد الدراسية</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة مادة جديدة</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="subjectName" placeholder="اسم المادة" class="input-field">
+                        <select id="subjectDifficulty" class="input-field">
+                            <option value="سهل">سهل</option>
+                            <option value="متوسط">متوسط</option>
+                            <option value="صعب">صعب</option>
+                        </select>
+                        <button onclick="addSubject()" class="btn-primary">
+                            <i class="fas fa-plus ml-2"></i>إضافة المادة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>اسم المادة</th>
+                                <th>مستوى الصعوبة</th>
+                                <th>الفصول</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div id="schedule" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">جداول المذاكرة</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة جلسة مذاكرة</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <select id="scheduleSubject" class="input-field">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="date" id="scheduleDate" class="input-field">
+                        <input type="time" id="scheduleStartTime" class="input-field">
+                        <input type="time" id="scheduleEndTime" class="input-field">
+                        <button onclick="addSchedule()" class="btn-primary">
+                            <i class="fas fa-plus ml-2"></i>إضافة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>التاريخ</th>
+                                <th>وقت البداية</th>
+                                <th>وقت النهاية</th>
+                                <th>المدة</th>
+                                <th>حالة التنفيذ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Section -->
+        <div id="lessons" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">إدارة الدروس الخصوصية</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة درس جديد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <select id="lessonSubject" class="input-field">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="text" id="lessonTeacher" placeholder="اسم المدرس" class="input-field">
+                        <input type="text" id="lessonLocation" placeholder="مكان الدرس" class="input-field">
+                        <input type="number" id="lessonPrice" placeholder="مبلغ الدرس" class="input-field">
+                        <input type="time" id="lessonTime" class="input-field">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="font-bold mb-2">أيام الدرس:</p>
+                        <div class="grid grid-cols-3 md:grid-cols-7 gap-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الأحد" class="lesson-day ml-2">
+                                الأحد
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الاثنين" class="lesson-day ml-2">
+                                الاثنين
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الثلاثاء" class="lesson-day ml-2">
+                                الثلاثاء
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الأربعاء" class="lesson-day ml-2">
+                                الأربعاء
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الخميس" class="lesson-day ml-2">
+                                الخميس
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="الجمعة" class="lesson-day ml-2">
+                                الجمعة
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="السبت" class="lesson-day ml-2">
+                                السبت
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addLesson()" class="btn-primary">
+                        <i class="fas fa-plus ml-2"></i>إضافة الدرس
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>المدرس</th>
+                                <th>المكان</th>
+                                <th>الأيام</th>
+                                <th>الوقت</th>
+                                <th>المبلغ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lessonsTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Management Section -->
+        <div id="timeManagement" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">إدارة الوقت والخطط اليومية</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة خطة يومية</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <input type="text" id="planActivity" placeholder="النشاط" class="input-field">
+                        <input type="time" id="planStartTime" class="input-field">
+                        <input type="time" id="planEndTime" class="input-field">
+                        <select id="planPeriod" class="input-field">
+                            <option value="صباحية">صباحية</option>
+                            <option value="ظهيرة">ظهيرة</option>
+                            <option value="مسائية">مسائية</option>
+                        </select>
+                        <button onclick="addDailyPlan()" class="btn-primary">
+                            <i class="fas fa-plus ml-2"></i>إضافة
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <input type="date" id="planDate" class="input-field">
+                        <span class="mr-2" id="currentDay"></span>
+                    </div>
+                </div>
+                
+                <!-- Period Filters -->
+                <div class="mb-4 text-center">
+                    <button onclick="filterPlans('all')" class="btn-secondary mr-2">الكل</button>
+                    <button onclick="filterPlans('صباحية')" class="btn-secondary mr-2">صباحية</button>
+                    <button onclick="filterPlans('ظهيرة')" class="btn-secondary mr-2">ظهيرة</button>
+                    <button onclick="filterPlans('مسائية')" class="btn-secondary">مسائية</button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>النشاط</th>
+                                <th>التاريخ</th>
+                                <th>اليوم</th>
+                                <th>الفترة</th>
+                                <th>وقت البداية</th>
+                                <th>وقت النهاية</th>
+                                <th>حالة التنفيذ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyPlansTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Educational Links Section -->
+        <div id="links" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">سجل المواقع التعليمية</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة رابط تعليمي جديد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="url" id="linkUrl" placeholder="رابط الموقع" class="input-field">
+                        <input type="text" id="linkDescription" placeholder="وصف الرابط" class="input-field">
+                        <select id="linkSubject" class="input-field">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="text" id="linkTeacher" placeholder="اسم المعلم" class="input-field">
+                    </div>
+                    <button onclick="addEducationalLink()" class="btn-primary">
+                        <i class="fas fa-plus ml-2"></i>إضافة الرابط
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>الرابط</th>
+                                <th>الوصف</th>
+                                <th>المادة</th>
+                                <th>المعلم</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linksTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books Section -->
+        <div id="books" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">إدارة الكتب</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة كتاب جديد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="bookName" placeholder="اسم الكتاب" class="input-field">
+                        <select id="bookSubject" class="input-field">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="number" id="bookPrice" placeholder="ثمن الكتاب" class="input-field">
+                        <button onclick="addBook()" class="btn-primary">
+                            <i class="fas fa-plus ml-2"></i>إضافة الكتاب
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>اسم الكتاب</th>
+                                <th>المادة</th>
+                                <th>الثمن</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 card p-4 text-center">
+                    <h4 class="text-lg font-bold">إجمالي ثمن الكتب: <span id="totalBooksPrice" class="achievement-badge">0 جنيه</span></h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">التقارير والإحصائيات</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Study Hours Report -->
+                    <div class="card p-4">
+                        <h3 class="text-lg font-bold mb-4">ساعات المذاكرة</h3>
+                        <div id="studyHoursReport" class="space-y-2">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                    
+                    <!-- Subjects Progress -->
+                    <div class="card p-4">
+                        <h3 class="text-lg font-bold mb-4">تقدم المواد</h3>
+                        <div id="subjectsProgress" class="space-y-2">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Review -->
+                    <div class="card p-4">
+                        <h3 class="text-lg font-bold mb-4">مراجعة أسبوعية</h3>
+                        <div id="weeklyReview" class="space-y-2">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Section -->
+        <div id="achievements" class="section hidden">
+            <div class="card p-6">
+                <h2 class="section-title">ملف الإنجاز</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-4">إضافة إنجاز جديد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <select id="achievementSubject" class="input-field">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="text" id="achievementChapter" placeholder="اسم الفصل" class="input-field">
+                        <input type="text" id="achievementLesson" placeholder="اسم الدرس" class="input-field">
+                        <input type="text" id="achievementBook" placeholder="اسم الكتاب" class="input-field">
+                        <select id="achievementStatus" class="input-field">
+                            <option value="تم المذاكرة">تم المذاكرة</option>
+                            <option value="تم المراجعة">تم المراجعة</option>
+                            <option value="مؤجل">مؤجل</option>
+                        </select>
+                    </div>
+                    <div class="mt-4">
+                        <input type="date" id="achievementDate" class="input-field">
+                        <span class="mr-2" id="achievementDay"></span>
+                        <button onclick="addAchievement()" class="btn-primary mr-2">
+                            <i class="fas fa-plus ml-2"></i>إضافة الإنجاز
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Subject Filter -->
+                <div class="mb-4 text-center">
+                    <select id="achievementFilter" onchange="filterAchievements()" class="input-field">
+                        <option value="">جميع المواد</option>
+                    </select>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>الفصل</th>
+                                <th>الدرس</th>
+                                <th>الكتاب</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>اليوم</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="achievementsTable">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentSection = 'dashboard';
+        let data = {
+            subjects: [
+                {id: 1, name: 'اللغة العربية', difficulty: 'متوسط'},
+                {id: 2, name: 'اللغة الإنجليزية', difficulty: 'متوسط'},
+                {id: 3, name: 'الفيزياء', difficulty: 'صعب'},
+                {id: 4, name: 'الكيمياء', difficulty: 'صعب'},
+                {id: 5, name: 'الأحياء', difficulty: 'متوسط'}
+            ],
+            schedule: [],
+            lessons: [],
+            dailyPlans: [],
+            educationalLinks: [],
+            books: [],
+            achievements: [],
+            userName: '',
+            userAvatar: ''
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            initializeApp();
+            updateDashboard();
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('smartSupportApp');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                data = { ...data, ...parsed };
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('smartSupportApp', JSON.stringify(data));
+        }
+
+        // Initialize App Components
+        function initializeApp() {
+            // Set current date for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                if (!input.value) input.value = today;
+            });
+
+            // Set user name and avatar
+            if (data.userName) {
+                document.getElementById('userName').value = data.userName;
+                document.getElementById('displayName').textContent = data.userName;
+            }
+            if (data.userAvatar) {
+                document.getElementById('userAvatar').src = data.userAvatar;
+            }
+
+            // Set current day display
+            updateCurrentDay();
+            
+            // Initialize all displays
+            displaySubjects();
+            displaySchedule();
+            displayLessons();
+            displayDailyPlans();
+            displayEducationalLinks();
+            displayBooks();
+            displayAchievements();
+            updateSelectOptions();
+        }
+
+        // Update current day displays
+        function updateCurrentDay() {
+            const date = new Date();
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const currentDay = days[date.getDay()];
+            
+            document.querySelectorAll('#currentDay, #achievementDay').forEach(el => {
+                el.textContent = currentDay;
+            });
+        }
+
+        // Show/Hide Sections
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.remove('hidden');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Update displays when switching sections
+            if (sectionName === 'reports') {
+                updateReports();
+            }
+        }
+
+        // User Management
+        document.getElementById('userName').addEventListener('input', function() {
+            data.userName = this.value;
+            document.getElementById('displayName').textContent = this.value || 'طالب/ة';
+            saveData();
+        });
+
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.getElementById('userAvatar');
+                    avatar.src = e.target.result;
+                    data.userAvatar = e.target.result;
+                    saveData();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Subjects Management
+        function addSubject() {
+            const name = document.getElementById('subjectName').value.trim();
+            const difficulty = document.getElementById('subjectDifficulty').value;
+            
+            if (!name) {
+                alert('يرجى إدخال اسم المادة');
+                return;
+            }
+            
+            const subject = {
+                id: Date.now(),
+                name: name,
+                difficulty: difficulty
+            };
+            
+            data.subjects.push(subject);
+            saveData();
+            displaySubjects();
+            updateSelectOptions();
+            
+            // Clear form
+            document.getElementById('subjectName').value = '';
+            document.getElementById('subjectDifficulty').value = 'سهل';
+        }
+
+        function displaySubjects() {
+            const tbody = document.getElementById('subjectsTable');
+            tbody.innerHTML = '';
+            
+            data.subjects.forEach(subject => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${subject.name}</td>
+                    <td><span class="achievement-badge">${subject.difficulty}</span></td>
+                    <td>
+                        <button onclick="manageChapters(${subject.id})" class="btn-secondary">
+                            <i class="fas fa-list ml-1"></i>إدارة الفصول
+                        </button>
+                    </td>
+                    <td>
+                        <button onclick="deleteSubject(${subject.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteSubject(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المادة؟')) {
+                data.subjects = data.subjects.filter(s => s.id !== id);
+                saveData();
+                displaySubjects();
+                updateSelectOptions();
+            }
+        }
+
+        function manageChapters(subjectId) {
+            // This would open a modal for managing chapters - simplified for this example
+            alert('ميزة إدارة الفصول ستكون متاحة قريباً');
+        }
+
+        // Schedule Management
+        function addSchedule() {
+            const subject = document.getElementById('scheduleSubject').value;
+            const date = document.getElementById('scheduleDate').value;
+            const startTime = document.getElementById('scheduleStartTime').value;
+            const endTime = document.getElementById('scheduleEndTime').value;
+            
+            if (!subject || !date || !startTime || !endTime) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            const schedule = {
+                id: Date.now(),
+                subject: subject,
+                date: date,
+                startTime: startTime,
+                endTime: endTime,
+                executed: false
+            };
+            
+            data.schedule.push(schedule);
+            saveData();
+            displaySchedule();
+            
+            // Clear form
+            document.getElementById('scheduleSubject').value = '';
+            document.getElementById('scheduleStartTime').value = '';
+            document.getElementById('scheduleEndTime').value = '';
+        }
+
+        function displaySchedule() {
+            const tbody = document.getElementById('scheduleTable');
+            tbody.innerHTML = '';
+            
+            data.schedule.forEach(item => {
+                const startTime = new Date(`2000-01-01T${item.startTime}`);
+                const endTime = new Date(`2000-01-01T${item.endTime}`);
+                const duration = Math.round((endTime - startTime) / (1000 * 60)); // in minutes
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.subject}</td>
+                    <td>${item.date}</td>
+                    <td>${item.startTime}</td>
+                    <td>${item.endTime}</td>
+                    <td>${duration} دقيقة</td>
+                    <td>
+                        <label class="flex items-center">
+                            <input type="checkbox" ${item.executed ? 'checked' : ''} 
+                                   onchange="toggleScheduleExecution(${item.id})" class="ml-2">
+                            ${item.executed ? 'تم التنفيذ' : 'لم يتم'}
+                        </label>
+                    </td>
+                    <td>
+                        <button onclick="deleteSchedule(${item.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function toggleScheduleExecution(id) {
+            const item = data.schedule.find(s => s.id === id);
+            if (item) {
+                item.executed = !item.executed;
+                saveData();
+                displaySchedule();
+            }
+        }
+
+        function deleteSchedule(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الجلسة؟')) {
+                data.schedule = data.schedule.filter(s => s.id !== id);
+                saveData();
+                displaySchedule();
+            }
+        }
+
+        // Lessons Management
+        function addLesson() {
+            const subject = document.getElementById('lessonSubject').value;
+            const teacher = document.getElementById('lessonTeacher').value.trim();
+            const location = document.getElementById('lessonLocation').value.trim();
+            const price = document.getElementById('lessonPrice').value;
+            const time = document.getElementById('lessonTime').value;
+            
+            const selectedDays = Array.from(document.querySelectorAll('.lesson-day:checked'))
+                                     .map(cb => cb.value);
+            
+            if (!subject || !teacher || !location || !time || selectedDays.length === 0) {
+                alert('يرجى ملء جميع الحقول واختيار يوم واحد على الأقل');
+                return;
+            }
+            
+            const lesson = {
+                id: Date.now(),
+                subject: subject,
+                teacher: teacher,
+                location: location,
+                price: parseFloat(price) || 0,
+                time: time,
+                days: selectedDays
+            };
+            
+            data.lessons.push(lesson);
+            saveData();
+            displayLessons();
+            
+            // Clear form
+            document.getElementById('lessonSubject').value = '';
+            document.getElementById('lessonTeacher').value = '';
+            document.getElementById('lessonLocation').value = '';
+            document.getElementById('lessonPrice').value = '';
+            document.getElementById('lessonTime').value = '';
+            document.querySelectorAll('.lesson-day').forEach(cb => cb.checked = false);
+        }
+
+        function displayLessons() {
+            const tbody = document.getElementById('lessonsTable');
+            tbody.innerHTML = '';
+            
+            data.lessons.forEach(lesson => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${lesson.subject}</td>
+                    <td>${lesson.teacher}</td>
+                    <td>${lesson.location}</td>
+                    <td>${lesson.days.join(', ')}</td>
+                    <td>${lesson.time}</td>
+                    <td>${lesson.price} جنيه</td>
+                    <td>
+                        <button onclick="deleteLesson(${lesson.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteLesson(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الدرس؟')) {
+                data.lessons = data.lessons.filter(l => l.id !== id);
+                saveData();
+                displayLessons();
+            }
+        }
+
+        // Daily Plans Management
+        function addDailyPlan() {
+            const activity = document.getElementById('planActivity').value.trim();
+            const startTime = document.getElementById('planStartTime').value;
+            const endTime = document.getElementById('planEndTime').value;
+            const period = document.getElementById('planPeriod').value;
+            const date = document.getElementById('planDate').value;
+            
+            if (!activity || !startTime || !endTime || !period || !date) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            const plan = {
+                id: Date.now(),
+                activity: activity,
+                startTime: startTime,
+                endTime: endTime,
+                period: period,
+                date: date,
+                day: getDayName(date),
+                executed: false
+            };
+            
+            data.dailyPlans.push(plan);
+            saveData();
+            displayDailyPlans();
+            
+            // Clear form
+            document.getElementById('planActivity').value = '';
+            document.getElementById('planStartTime').value = '';
+            document.getElementById('planEndTime').value = '';
+        }
+
+        function displayDailyPlans() {
+            const tbody = document.getElementById('dailyPlansTable');
+            tbody.innerHTML = '';
+            
+            data.dailyPlans.forEach(plan => {
+                const row = tbody.insertRow();
+                row.className = `plan-${plan.period}`;
+                row.innerHTML = `
+                    <td>${plan.activity}</td>
+                    <td>${plan.date}</td>
+                    <td>${plan.day}</td>
+                    <td><span class="time-period">${plan.period}</span></td>
+                    <td>${plan.startTime}</td>
+                    <td>${plan.endTime}</td>
+                    <td>
+                        <label class="flex items-center">
+                            <input type="checkbox" ${plan.executed ? 'checked' : ''} 
+                                   onchange="togglePlanExecution(${plan.id})" class="ml-2">
+                            ${plan.executed ? 'تم التنفيذ' : 'لم يتم'}
+                        </label>
+                    </td>
+                    <td>
+                        <button onclick="deleteDailyPlan(${plan.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function filterPlans(period) {
+            const rows = document.querySelectorAll('#dailyPlansTable tr');
+            rows.forEach(row => {
+                if (period === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = row.classList.contains(`plan-${period}`) ? '' : 'none';
+                }
+            });
+        }
+
+        function togglePlanExecution(id) {
+            const plan = data.dailyPlans.find(p => p.id === id);
+            if (plan) {
+                plan.executed = !plan.executed;
+                saveData();
+                displayDailyPlans();
+            }
+        }
+
+        function deleteDailyPlan(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الخطة؟')) {
+                data.dailyPlans = data.dailyPlans.filter(p => p.id !== id);
+                saveData();
+                displayDailyPlans();
+            }
+        }
+
+        // Educational Links Management
+        function addEducationalLink() {
+            const url = document.getElementById('linkUrl').value.trim();
+            const description = document.getElementById('linkDescription').value.trim();
+            const subject = document.getElementById('linkSubject').value;
+            const teacher = document.getElementById('linkTeacher').value.trim();
+            
+            if (!url || !description || !subject) {
+                alert('يرجى ملء الحقول المطلوبة');
+                return;
+            }
+            
+            const link = {
+                id: Date.now(),
+                url: url,
+                description: description,
+                subject: subject,
+                teacher: teacher
+            };
+            
+            data.educationalLinks.push(link);
+            saveData();
+            displayEducationalLinks();
+            
+            // Clear form
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkDescription').value = '';
+            document.getElementById('linkSubject').value = '';
+            document.getElementById('linkTeacher').value = '';
+        }
+
+        function displayEducationalLinks() {
+            const tbody = document.getElementById('linksTable');
+            tbody.innerHTML = '';
+            
+            data.educationalLinks.forEach(link => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>
+                        <a href="${link.url}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-external-link-alt ml-2"></i>${link.url}
+                        </a>
+                    </td>
+                    <td>${link.description}</td>
+                    <td>${link.subject}</td>
+                    <td>${link.teacher || '-'}</td>
+                    <td>
+                        <button onclick="deleteEducationalLink(${link.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteEducationalLink(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الرابط؟')) {
+                data.educationalLinks = data.educationalLinks.filter(l => l.id !== id);
+                saveData();
+                displayEducationalLinks();
+            }
+        }
+
+        // Books Management
+        function addBook() {
+            const name = document.getElementById('bookName').value.trim();
+            const subject = document.getElementById('bookSubject').value;
+            const price = parseFloat(document.getElementById('bookPrice').value) || 0;
+            
+            if (!name || !subject) {
+                alert('يرجى إدخال اسم الكتاب والمادة');
+                return;
+            }
+            
+            const book = {
+                id: Date.now(),
+                name: name,
+                subject: subject,
+                price: price
+            };
+            
+            data.books.push(book);
+            saveData();
+            displayBooks();
+            
+            // Clear form
+            document.getElementById('bookName').value = '';
+            document.getElementById('bookSubject').value = '';
+            document.getElementById('bookPrice').value = '';
+        }
+
+        function displayBooks() {
+            const tbody = document.getElementById('booksTable');
+            tbody.innerHTML = '';
+            
+            let totalPrice = 0;
+            
+            data.books.forEach(book => {
+                totalPrice += book.price;
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${book.name}</td>
+                    <td>${book.subject}</td>
+                    <td>${book.price} جنيه</td>
+                    <td>
+                        <button onclick="deleteBook(${book.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+            
+            document.getElementById('totalBooksPrice').textContent = totalPrice + ' جنيه';
+        }
+
+        function deleteBook(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الكتاب؟')) {
+                data.books = data.books.filter(b => b.id !== id);
+                saveData();
+                displayBooks();
+            }
+        }
+
+        // Achievements Management
+        function addAchievement() {
+            const subject = document.getElementById('achievementSubject').value;
+            const chapter = document.getElementById('achievementChapter').value.trim();
+            const lesson = document.getElementById('achievementLesson').value.trim();
+            const book = document.getElementById('achievementBook').value.trim();
+            const status = document.getElementById('achievementStatus').value;
+            const date = document.getElementById('achievementDate').value;
+            
+            if (!subject || !chapter || !lesson || !status || !date) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+            
+            const achievement = {
+                id: Date.now(),
+                subject: subject,
+                chapter: chapter,
+                lesson: lesson,
+                book: book,
+                status: status,
+                date: date,
+                day: getDayName(date)
+            };
+            
+            data.achievements.push(achievement);
+            saveData();
+            displayAchievements();
+            
+            // Clear form
+            document.getElementById('achievementSubject').value = '';
+            document.getElementById('achievementChapter').value = '';
+            document.getElementById('achievementLesson').value = '';
+            document.getElementById('achievementBook').value = '';
+            document.getElementById('achievementStatus').value = 'تم المذاكرة';
+        }
+
+        function displayAchievements() {
+            const tbody = document.getElementById('achievementsTable');
+            tbody.innerHTML = '';
+            
+            const filter = document.getElementById('achievementFilter').value;
+            const filteredAchievements = filter ? 
+                data.achievements.filter(a => a.subject === filter) : 
+                data.achievements;
+            
+            filteredAchievements.forEach(achievement => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${achievement.subject}</td>
+                    <td>${achievement.chapter}</td>
+                    <td>${achievement.lesson}</td>
+                    <td>${achievement.book || '-'}</td>
+                    <td><span class="achievement-badge">${achievement.status}</span></td>
+                    <td>${achievement.date}</td>
+                    <td>${achievement.day}</td>
+                    <td>
+                        <button onclick="deleteAchievement(${achievement.id})" class="btn-danger">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function filterAchievements() {
+            displayAchievements();
+        }
+
+        function deleteAchievement(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الإنجاز؟')) {
+                data.achievements = data.achievements.filter(a => a.id !== id);
+                saveData();
+                displayAchievements();
+            }
+        }
+
+        // Utility Functions
+        function getDayName(dateString) {
+            const date = new Date(dateString);
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            return days[date.getDay()];
+        }
+
+        function updateSelectOptions() {
+            const selects = [
+                'scheduleSubject', 'lessonSubject', 'linkSubject', 
+                'bookSubject', 'achievementSubject', 'achievementFilter'
+            ];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const currentValue = select.value;
+                    select.innerHTML = selectId === 'achievementFilter' ? 
+                        '<option value="">جميع المواد</option>' : 
+                        '<option value="">اختر المادة</option>';
+                    
+                    data.subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.name;
+                        option.textContent = subject.name;
+                        select.appendChild(option);
+                    });
+                    
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        function updateDashboard() {
+            // Update stats
+            document.getElementById('subjectsCount').textContent = data.subjects.length;
+            document.getElementById('lessonsCount').textContent = data.lessons.length;
+            
+            // Calculate study hours
+            const totalMinutes = data.schedule.filter(s => s.executed).reduce((total, item) => {
+                const start = new Date(`2000-01-01T${item.startTime}`);
+                const end = new Date(`2000-01-01T${item.endTime}`);
+                return total + (end - start) / (1000 * 60);
+            }, 0);
+            document.getElementById('studyHours').textContent = Math.round(totalMinutes / 60) + ' ساعة';
+            
+            // Update today's schedule
+            const today = new Date().toISOString().split('T')[0];
+            const todaySchedule = data.schedule.filter(s => s.date === today);
+            const todayPlans = data.dailyPlans.filter(p => p.date === today);
+            
+            const todayScheduleDiv = document.getElementById('todaySchedule');
+            todayScheduleDiv.innerHTML = '';
+            
+            if (todaySchedule.length === 0 && todayPlans.length === 0) {
+                todayScheduleDiv.innerHTML = '<p class="text-gray-600 text-center">لا توجد مهام اليوم</p>';
+            } else {
+                [...todaySchedule, ...todayPlans].forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'p-2 bg-blue-50 rounded mb-2';
+                    div.innerHTML = `
+                        <strong>${item.subject || item.activity}</strong><br>
+                        <small>${item.startTime} - ${item.endTime}</small>
+                    `;
+                    todayScheduleDiv.appendChild(div);
+                });
+            }
+        }
+
+        function updateReports() {
+            // Study Hours Report
+            const studyHoursReport = document.getElementById('studyHoursReport');
+            studyHoursReport.innerHTML = '';
+            
+            const subjectHours = {};
+            data.schedule.filter(s => s.executed).forEach(item => {
+                const start = new Date(`2000-01-01T${item.startTime}`);
+                const end = new Date(`2000-01-01T${item.endTime}`);
+                const minutes = (end - start) / (1000 * 60);
+                
+                if (!subjectHours[item.subject]) {
+                    subjectHours[item.subject] = 0;
+                }
+                subjectHours[item.subject] += minutes;
+            });
+            
+            Object.entries(subjectHours).forEach(([subject, minutes]) => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-2 bg-blue-50 rounded mb-2';
+                div.innerHTML = `
+                    <span>${subject}</span>
+                    <span class="achievement-badge">${Math.round(minutes / 60)} ساعة</span>
+                `;
+                studyHoursReport.appendChild(div);
+            });
+            
+            // Subjects Progress
+            const subjectsProgress = document.getElementById('subjectsProgress');
+            subjectsProgress.innerHTML = '';
+            
+            data.subjects.forEach(subject => {
+                const achievements = data.achievements.filter(a => a.subject === subject.name);
+                const completed = achievements.filter(a => a.status === 'تم المذاكرة').length;
+                const reviewed = achievements.filter(a => a.status === 'تم المراجعة').length;
+                
+                const div = document.createElement('div');
+                div.className = 'p-2 bg-green-50 rounded mb-2';
+                div.innerHTML = `
+                    <strong>${subject.name}</strong><br>
+                    <small>مذاكرة: ${completed} | مراجعة: ${reviewed}</small>
+                `;
+                subjectsProgress.appendChild(div);
+            });
+            
+            // Weekly Review
+            const weeklyReview = document.getElementById('weeklyReview');
+            weeklyReview.innerHTML = '';
+            
+            const thisWeek = getThisWeekAchievements();
+            thisWeek.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = 'p-2 bg-yellow-50 rounded mb-2';
+                div.innerHTML = `
+                    <strong>${achievement.subject}</strong><br>
+                    <small>${achievement.chapter} - ${achievement.lesson}</small><br>
+                    <small>${achievement.status} (${achievement.day})</small>
+                `;
+                weeklyReview.appendChild(div);
+            });
+        }
+
+        function getThisWeekAchievements() {
+            const today = new Date();
+            const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+            const weekEnd = new Date(today.setDate(weekStart.getDate() + 6));
+            
+            return data.achievements.filter(achievement => {
+                const achievementDate = new Date(achievement.date);
+                return achievementDate >= weekStart && achievementDate <= weekEnd;
+            });
+        }
+
+        // Auto-update dashboard every minute
+        setInterval(updateDashboard, 60000);
+    </script>
+</body>
+</html>
