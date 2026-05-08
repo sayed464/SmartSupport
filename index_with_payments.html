@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدعم الذكي - تطبيق تنظيم المذاكرة والوقت</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        * {
+            font-family: 'Cairo', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header-bg {
+            background: linear-gradient(rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><rect fill="%234F46E5" width="1200" height="400"/><path fill="%236366F1" d="M0,200 Q300,50 600,200 T1200,200 L1200,400 L0,400 Z"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .prayer-card {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .prayer-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-item {
+            padding: 15px 20px;
+            margin: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .btn-edit, .btn-delete {
+            padding: 5px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .btn-edit {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .notification {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .stats-card {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-profile {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .prayer-time-current {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            color: white;
+        }
+        
+        .prayer-time-next {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-bg text-white p-6">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-2">الدعم الذكي</h1>
+            <p class="text-xl mb-4">تنظيم المذاكرة والوقت لطلاب الثانوية العامة المصرية</p>
+            <div class="text-lg mb-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                اللهم لا سهل إلا ما جعلته سهلا وأنت تجعل الحزن إن شئت سهلا، اللهم اشرح لي صدري ويسر لي أمري واحلل عقدة من لساني يفقهوا قولي، اللهم افتح علي فتوح العارفين بفضلك
+            </div>
+            <div class="text-lg font-bold mb-2">صدقة جارية</div>
+            <div class="mb-2">أسألكم الدعاء لي ولوالدي وأولادي بصالح الأعمال</div>
+            <div class="text-sm">تم التطوير بواسطة المطور: سيد أمين</div>
+        </div>
+    </div>
+
+    <!-- User Profile Section -->
+    <div class="user-profile mx-6 -mt-6">
+        <div class="profile-image mx-auto" onclick="document.getElementById('profileImageInput').click()">
+            <i class="fas fa-user"></i>
+        </div>
+        <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+        <input type="text" id="userName" placeholder="أدخل اسمك" class="form-control text-center font-bold">
+    </div>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 min-h-screen">
+            <div class="p-4">
+                <div class="sidebar-item active" onclick="showPage('home')">
+                    <i class="fas fa-home mr-3"></i>الصفحة الرئيسية
+                </div>
+                <div class="sidebar-item" onclick="showPage('subjects')">
+                    <i class="fas fa-book mr-3"></i>إدارة المواد
+                </div>
+                <div class="sidebar-item" onclick="showPage('schedule')">
+                    <i class="fas fa-calendar mr-3"></i>جداول المذاكرة
+                </div>
+                <div class="sidebar-item" onclick="showPage('lessons')">
+                    <i class="fas fa-chalkboard-teacher mr-3"></i>إدارة الدروس
+                </div>
+                <div class="sidebar-item" onclick="showPage('timeManagement')">
+                    <i class="fas fa-clock mr-3"></i>إدارة الوقت
+                </div>
+                <div class="sidebar-item" onclick="showPage('websites')">
+                    <i class="fas fa-globe mr-3"></i>المواقع التعليمية
+                </div>
+                <div class="sidebar-item" onclick="showPage('prayers')">
+                    <i class="fas fa-mosque mr-3"></i>مواقيت الصلاة
+                </div>
+                <div class="sidebar-item" onclick="showPage('payments')">
+                    <i class="fas fa-money-bill mr-3"></i>سجل المدفوعات
+                </div>
+                <div class="sidebar-item" onclick="showPage('reports')">
+                    <i class="fas fa-chart-bar mr-3"></i>التقارير
+                </div>
+                <div class="sidebar-item" onclick="showPage('achievements')">
+                    <i class="fas fa-trophy mr-3"></i>صفحة الإنجاز
+                </div>
+                <div class="sidebar-item" onclick="showPage('settings')">
+                    <i class="fas fa-cog mr-3"></i>الإعدادات
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <!-- Home Page -->
+            <div id="home" class="page-section active">
+                <div class="card p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4 text-center">مرحباً بك في تطبيق الدعم الذكي</h2>
+                    
+                    <!-- Current Time and Date -->
+                    <div class="text-center mb-6">
+                        <div id="currentTime" class="text-3xl font-bold text-blue-600"></div>
+                        <div id="currentDate" class="text-lg text-gray-600"></div>
+                    </div>
+
+                    <!-- Today's Notifications -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="notification">
+                            <h3 class="font-bold mb-2"><i class="fas fa-book mr-2"></i>جدول المذاكرة اليوم</h3>
+                            <div id="todayStudy">لا توجد جلسات مذاكرة محددة لليوم</div>
+                        </div>
+                        <div class="notification">
+                            <h3 class="font-bold mb-2"><i class="fas fa-chalkboard-teacher mr-2"></i>الدروس الخصوصية اليوم</h3>
+                            <div id="todayLessons">لا توجد دروس محددة لليوم</div>
+                        </div>
+                    </div>
+
+                    <!-- Prayer Times Today -->
+                    <div class="prayer-times-today mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-center">مواقيت الصلاة اليوم</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2" id="prayerTimesToday"></div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div class="stats-card">
+                            <div class="text-3xl font-bold text-blue-600" id="totalSubjects">0</div>
+                            <div class="text-gray-600">إجمالي المواد</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-3xl font-bold text-green-600" id="totalStudyHours">0</div>
+                            <div class="text-gray-600">ساعات المذاكرة</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-3xl font-bold text-purple-600" id="totalLessons">0</div>
+                            <div class="text-gray-600">عدد الدروس</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-3xl font-bold text-red-600" id="monthlyPayments">0</div>
+                            <div class="text-gray-600">مدفوعات الشهر</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subjects Management -->
+            <div id="subjects" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">إدارة المواد الدراسية</h2>
+                        <button class="btn-primary" onclick="showAddSubjectModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة مادة جديدة
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم المادة</th>
+                                    <th>مستوى الصعوبة</th>
+                                    <th>الأولوية</th>
+                                    <th>عدد الساعات الأسبوعية</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Schedule -->
+            <div id="schedule" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">جداول المذاكرة</h2>
+                        <button class="btn-primary" onclick="showAddScheduleModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة جلسة مذاكرة
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>اليوم</th>
+                                    <th>المادة</th>
+                                    <th>وقت البداية</th>
+                                    <th>وقت النهاية</th>
+                                    <th>فترة الراحة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lessons Management -->
+            <div id="lessons" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">إدارة الدروس الخصوصية</h2>
+                        <button class="btn-primary" onclick="showAddLessonModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة درس جديد
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>المعلم</th>
+                                    <th>المكان</th>
+                                    <th>الأيام</th>
+                                    <th>الوقت</th>
+                                    <th>المبلغ</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lessonsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Management -->
+            <div id="timeManagement" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">إدارة الوقت اليومي</h2>
+                        <button class="btn-primary" onclick="showAddTimeSlotModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة خطة يومية
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <input type="date" id="timeManagementDate" class="form-control inline-block w-auto" onchange="filterTimeSlots()">
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg text-green-600">الفترة الصباحية</h3>
+                            <div id="morningSlots"></div>
+                        </div>
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg text-blue-600">فترة الظهيرة</h3>
+                            <div id="afternoonSlots"></div>
+                        </div>
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg text-purple-600">الفترة المسائية</h3>
+                            <div id="eveningSlots"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>اليوم</th>
+                                    <th>الفترة</th>
+                                    <th>الوقت</th>
+                                    <th>النشاط</th>
+                                    <th>حالة التنفيذ</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="timeSlotsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Educational Websites -->
+            <div id="websites" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">سجل المواقع التعليمية</h2>
+                        <button class="btn-primary" onclick="showAddWebsiteModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة موقع جديد
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>الرابط</th>
+                                    <th>الوصف</th>
+                                    <th>المعلم</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="websitesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prayer Times -->
+            <div id="prayers" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">مواقيت الصلاة</h2>
+                        <button class="btn-primary" onclick="showPrayerSettingsModal()">
+                            <i class="fas fa-cog mr-2"></i>إعدادات المواقيت
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <div id="nextPrayerCountdown" class="text-2xl font-bold text-green-600 mb-2"></div>
+                        <div class="text-gray-600">الوقت المتبقي للصلاة القادمة</div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="prayerTimesGrid"></div>
+                </div>
+            </div>
+
+            <!-- Monthly Payments -->
+            <div id="payments" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">سجل المدفوعات الشهرية للدروس</h2>
+                        <button class="btn-primary" onclick="showAddPaymentModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة دفعة جديدة
+                        </button>
+                    </div>
+
+                    <!-- Monthly Summary -->
+                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <div class="stats-card">
+                            <div class="text-2xl font-bold text-blue-600" id="currentMonthTotal">0</div>
+                            <div class="text-gray-600">إجمالي الشهر الحالي</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-2xl font-bold text-green-600" id="lastMonthTotal">0</div>
+                            <div class="text-gray-600">إجمالي الشهر الماضي</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-2xl font-bold text-purple-600" id="yearlyTotal">0</div>
+                            <div class="text-gray-600">إجمالي السنة</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="text-2xl font-bold text-red-600" id="averageMonthly">0</div>
+                            <div class="text-gray-600">المتوسط الشهري</div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Options -->
+                    <div class="flex gap-4 mb-4">
+                        <select id="paymentMonthFilter" class="form-control w-auto" onchange="filterPayments()">
+                            <option value="">كل الشهور</option>
+                            <option value="01">يناير</option>
+                            <option value="02">فبراير</option>
+                            <option value="03">مارس</option>
+                            <option value="04">أبريل</option>
+                            <option value="05">مايو</option>
+                            <option value="06">يونيو</option>
+                            <option value="07">يوليو</option>
+                            <option value="08">أغسطس</option>
+                            <option value="09">سبتمبر</option>
+                            <option value="10">أكتوبر</option>
+                            <option value="11">نوفمبر</option>
+                            <option value="12">ديسمبر</option>
+                        </select>
+                        <select id="paymentYearFilter" class="form-control w-auto" onchange="filterPayments()">
+                            <option value="">كل السنوات</option>
+                        </select>
+                        <select id="paymentSubjectFilter" class="form-control w-auto" onchange="filterPayments()">
+                            <option value="">كل المواد</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>الشهر</th>
+                                    <th>المادة</th>
+                                    <th>المعلم</th>
+                                    <th>المبلغ</th>
+                                    <th>ملاحظات</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTable"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Monthly Summary Table -->
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-4">ملخص المدفوعات الشهرية</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الشهر</th>
+                                        <th>السنة</th>
+                                        <th>عدد المدفوعات</th>
+                                        <th>الإجمالي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyPaymentsSummary"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports -->
+            <div id="reports" class="page-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold mb-6">التقارير والإحصائيات</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">ساعات المذاكرة الإجمالية</h3>
+                            <div class="text-3xl font-bold text-blue-600" id="totalStudyHoursReport">0</div>
+                            <div class="text-gray-600 mt-2">ساعة هذا الشهر</div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">عدد الدروس المكتملة</h3>
+                            <div class="text-3xl font-bold text-green-600" id="completedLessons">0</div>
+                            <div class="text-gray-600 mt-2">درس مكتمل</div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">معدل الإنجاز</h3>
+                            <div class="text-3xl font-bold text-purple-600" id="achievementRate">0%</div>
+                            <div class="text-gray-600 mt-2">من الخطة المحددة</div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">إجمالي المصروفات</h3>
+                            <div class="text-3xl font-bold text-red-600" id="totalExpenses">0</div>
+                            <div class="text-gray-600 mt-2">جنيه مصري</div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">الكتب المشتراة</h3>
+                            <div class="text-3xl font-bold text-indigo-600" id="totalBooks">0</div>
+                            <div class="text-gray-600 mt-2">كتاب</div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h3 class="font-bold text-lg mb-4">المواقع التعليمية</h3>
+                            <div class="text-3xl font-bold text-pink-600" id="totalWebsites">0</div>
+                            <div class="text-gray-600 mt-2">موقع محفوظ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div id="achievements" class="page-section">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">ملف الإنجاز</h2>
+                        <button class="btn-primary" onclick="showAddAchievementModal()">
+                            <i class="fas fa-plus mr-2"></i>إضافة إنجاز
+                        </button>
+                    </div>
+
+                    <!-- Subject Achievements -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-4">إنجازات المواد</h3>
+                        <div id="subjectAchievements" class="grid md:grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <!-- Achievements Timeline -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>اليوم</th>
+                                    <th>المادة</th>
+                                    <th>الفصل</th>
+                                    <th>اسم الدرس</th>
+                                    <th>الكتاب</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="achievementsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div id="settings" class="page-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold mb-6">الإعدادات</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="form-group">
+                            <label class="block text-lg font-bold mb-2">إعدادات التنبيهات</label>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="enableNotifications" class="mr-2">
+                                    تفعيل التنبيهات
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="enableSounds" class="mr-2">
+                                    تفعيل الأصوات
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-lg font-bold mb-2">إعدادات العرض</label>
+                            <select id="themeMode" class="form-control w-auto">
+                                <option value="light">الوضع النهاري</option>
+                                <option value="dark">الوضع الليلي</option>
+                                <option value="auto">تلقائي</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-lg font-bold mb-2">النسخ الاحتياطي</label>
+                            <div class="flex gap-4">
+                                <button class="btn-primary" onclick="exportData()">
+                                    <i class="fas fa-download mr-2"></i>تصدير البيانات
+                                </button>
+                                <button class="btn-primary" onclick="document.getElementById('importFile').click()">
+                                    <i class="fas fa-upload mr-2"></i>استيراد البيانات
+                                </button>
+                                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-lg font-bold mb-2">إعادة تعيين</label>
+                            <button class="btn-delete" onclick="resetAllData()">
+                                <i class="fas fa-trash mr-2"></i>مسح جميع البيانات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Subject Modal -->
+    <div id="addSubjectModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة مادة جديدة</h3>
+            <form id="subjectForm">
+                <div class="form-group">
+                    <label>اسم المادة</label>
+                    <input type="text" id="subjectName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>مستوى الصعوبة</label>
+                    <select id="subjectDifficulty" class="form-control">
+                        <option value="سهل">سهل</option>
+                        <option value="متوسط">متوسط</option>
+                        <option value="صعب">صعب</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الأولوية</label>
+                    <select id="subjectPriority" class="form-control">
+                        <option value="عالية">عالية</option>
+                        <option value="متوسطة">متوسطة</option>
+                        <option value="منخفضة">منخفضة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عدد الساعات الأسبوعية</label>
+                    <input type="number" id="subjectHours" class="form-control" min="1" max="40">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addSubjectModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Schedule Modal -->
+    <div id="addScheduleModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة جلسة مذاكرة</h3>
+            <form id="scheduleForm">
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" id="scheduleDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>المادة</label>
+                    <select id="scheduleSubject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label>وقت البداية</label>
+                    <input type="time" id="scheduleStartTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>وقت النهاية</label>
+                    <input type="time" id="scheduleEndTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>فترة الراحة (دقيقة)</label>
+                    <input type="number" id="scheduleBreak" class="form-control" min="0" value="15">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addScheduleModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Lesson Modal -->
+    <div id="addLessonModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة درس خصوصي</h3>
+            <form id="lessonForm">
+                <div class="form-group">
+                    <label>المادة</label>
+                    <select id="lessonSubject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label>اسم المعلم</label>
+                    <input type="text" id="lessonTeacher" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>المكان</label>
+                    <input type="text" id="lessonLocation" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الأيام</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label><input type="checkbox" value="السبت" class="lesson-days"> السبت</label>
+                        <label><input type="checkbox" value="الأحد" class="lesson-days"> الأحد</label>
+                        <label><input type="checkbox" value="الاثنين" class="lesson-days"> الاثنين</label>
+                        <label><input type="checkbox" value="الثلاثاء" class="lesson-days"> الثلاثاء</label>
+                        <label><input type="checkbox" value="الأربعاء" class="lesson-days"> الأربعاء</label>
+                        <label><input type="checkbox" value="الخميس" class="lesson-days"> الخميس</label>
+                        <label><input type="checkbox" value="الجمعة" class="lesson-days"> الجمعة</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>الوقت</label>
+                    <input type="time" id="lessonTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="lessonAmount" class="form-control" min="0" required>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addLessonModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Time Slot Modal -->
+    <div id="addTimeSlotModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة خطة يومية</h3>
+            <form id="timeSlotForm">
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" id="timeSlotDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الفترة</label>
+                    <select id="timeSlotPeriod" class="form-control" required>
+                        <option value="صباحية">صباحية (6 ص - 12 م)</option>
+                        <option value="ظهيرة">ظهيرة (12 م - 6 م)</option>
+                        <option value="مسائية">مسائية (6 م - 12 ص)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الوقت</label>
+                    <input type="time" id="timeSlotTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>النشاط</label>
+                    <input type="text" id="timeSlotActivity" class="form-control" required>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addTimeSlotModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Website Modal -->
+    <div id="addWebsiteModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة موقع تعليمي</h3>
+            <form id="websiteForm">
+                <div class="form-group">
+                    <label>المادة</label>
+                    <select id="websiteSubject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label>الرابط</label>
+                    <input type="url" id="websiteUrl" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="websiteDescription" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>المعلم</label>
+                    <input type="text" id="websiteTeacher" class="form-control">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addWebsiteModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Payment Modal -->
+    <div id="addPaymentModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة دفعة شهرية</h3>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" id="paymentDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الشهر</label>
+                    <select id="paymentMonth" class="form-control" required>
+                        <option value="01">يناير</option>
+                        <option value="02">فبراير</option>
+                        <option value="03">مارس</option>
+                        <option value="04">أبريل</option>
+                        <option value="05">مايو</option>
+                        <option value="06">يونيو</option>
+                        <option value="07">يوليو</option>
+                        <option value="08">أغسطس</option>
+                        <option value="09">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المادة</label>
+                    <select id="paymentSubject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label>المعلم</label>
+                    <input type="text" id="paymentTeacher" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="paymentAmount" class="form-control" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات</label>
+                    <textarea id="paymentNotes" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addPaymentModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Achievement Modal -->
+    <div id="addAchievementModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إضافة إنجاز</h3>
+            <form id="achievementForm">
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" id="achievementDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>المادة</label>
+                    <select id="achievementSubject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label>الفصل</label>
+                    <input type="text" id="achievementChapter" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>اسم الدرس</label>
+                    <input type="text" id="achievementLesson" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الكتاب</label>
+                    <input type="text" id="achievementBook" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="achievementStatus" class="form-control" required>
+                        <option value="تم المذاكرة">تم المذاكرة</option>
+                        <option value="تم المراجعة">تم المراجعة</option>
+                        <option value="مؤجل">مؤجل</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('addAchievementModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prayer Settings Modal -->
+    <div id="prayerSettingsModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">إعدادات مواقيت الصلاة</h3>
+            <form id="prayerSettingsForm">
+                <div class="form-group">
+                    <label>نوع الحساب</label>
+                    <select id="prayerMode" class="form-control" onchange="togglePrayerInputs()">
+                        <option value="automatic">تلقائي (فلكي)</option>
+                        <option value="manual">يدوي (مخصص)</option>
+                    </select>
+                </div>
+                <div id="manualPrayerInputs" style="display: none;">
+                    <div class="form-group">
+                        <label>الفجر</label>
+                        <input type="time" id="customFajr" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>الشروق</label>
+                        <input type="time" id="customSunrise" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>الظهر</label>
+                        <input type="time" id="customDhuhr" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>العصر</label>
+                        <input type="time" id="customAsr" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>المغرب</label>
+                        <input type="time" id="customMaghrib" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>العشاء</label>
+                        <input type="time" id="customIsha" class="form-control">
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="btn-primary">حفظ المواقيت</button>
+                    <button type="button" class="btn-delete" onclick="closeModal('prayerSettingsModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let appData = {
+            subjects: [],
+            schedule: [],
+            lessons: [],
+            timeSlots: [],
+            websites: [],
+            payments: [],
+            achievements: [],
+            settings: {
+                notifications: true,
+                sounds: true,
+                theme: 'light',
+                prayerMode: 'automatic',
+                customPrayerTimes: {}
+            },
+            userName: ''
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('smartStudyAppData');
+            if (savedData) {
+                appData = {...appData, ...JSON.parse(savedData)};
+            }
+            
+            // Load user name
+            if (appData.userName) {
+                document.getElementById('userName').value = appData.userName;
+            }
+            
+            // Load profile image
+            const savedImage = localStorage.getItem('profileImage');
+            if (savedImage) {
+                document.querySelector('.profile-image').innerHTML = `<img src="${savedImage}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('smartStudyAppData', JSON.stringify(appData));
+        }
+
+        // Initialize app
+        function initApp() {
+            loadData();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            updatePrayerTimes();
+            updateStats();
+            updateAllTables();
+            populateSelects();
+            
+            // Set current date in forms
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('timeManagementDate').value = today;
+            
+            // Add event listeners
+            document.getElementById('userName').addEventListener('input', function() {
+                appData.userName = this.value;
+                saveData();
+            });
+            
+            // Profile image upload
+            document.getElementById('profileImageInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageData = e.target.result;
+                        localStorage.setItem('profileImage', imageData);
+                        document.querySelector('.profile-image').innerHTML = `<img src="${imageData}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const timeOptions = {
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const dateOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            
+            document.getElementById('currentTime').textContent = now.toLocaleString('ar-EG', timeOptions);
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('ar-EG', dateOptions);
+        }
+
+        // Show/Hide pages
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Add active class to clicked sidebar item
+            event.target.classList.add('active');
+            
+            // Update specific page data
+            if (pageId === 'timeManagement') {
+                filterTimeSlots();
+            } else if (pageId === 'payments') {
+                updatePaymentStats();
+                updateMonthlyPaymentsSummary();
+                filterPayments();
+            } else if (pageId === 'achievements') {
+                updateSubjectAchievements();
+            }
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function showAddSubjectModal() {
+            document.getElementById('subjectForm').reset();
+            showModal('addSubjectModal');
+        }
+
+        function showAddScheduleModal() {
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('scheduleDate').value = new Date().toISOString().split('T')[0];
+            showModal('addScheduleModal');
+        }
+
+        function showAddLessonModal() {
+            document.getElementById('lessonForm').reset();
+            showModal('addLessonModal');
+        }
+
+        function showAddTimeSlotModal() {
+            document.getElementById('timeSlotForm').reset();
+            document.getElementById('timeSlotDate').value = new Date().toISOString().split('T')[0];
+            showModal('addTimeSlotModal');
+        }
+
+        function showAddWebsiteModal() {
+            document.getElementById('websiteForm').reset();
+            showModal('addWebsiteModal');
+        }
+
+        function showAddPaymentModal() {
+            document.getElementById('paymentForm').reset();
+            const today = new Date();
+            document.getElementById('paymentDate').value = today.toISOString().split('T')[0];
+            document.getElementById('paymentMonth').value = String(today.getMonth() + 1).padStart(2, '0');
+            showModal('addPaymentModal');
+        }
+
+        function showAddAchievementModal() {
+            document.getElementById('achievementForm').reset();
+            document.getElementById('achievementDate').value = new Date().toISOString().split('T')[0];
+            showModal('addAchievementModal');
+        }
+
+        function showPrayerSettingsModal() {
+            showModal('prayerSettingsModal');
+        }
+
+        // Populate select elements
+        function populateSelects() {
+            const subjectSelects = [
+                'scheduleSubject', 'lessonSubject', 'websiteSubject', 
+                'paymentSubject', 'achievementSubject'
+            ];
+            
+            subjectSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">اختر المادة</option>';
+                appData.subjects.forEach(subject => {
+                    select.innerHTML += `<option value="${subject.name}">${subject.name}</option>`;
+                });
+            });
+            
+            // Populate year filter
+            const yearSelect = document.getElementById('paymentYearFilter');
+            const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '<option value="">كل السنوات</option>';
+            for (let year = currentYear - 2; year <= currentYear + 1; year++) {
+                yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+            }
+            
+            // Populate subject filter for payments
+            const paymentSubjectFilter = document.getElementById('paymentSubjectFilter');
+            paymentSubjectFilter.innerHTML = '<option value="">كل المواد</option>';
+            appData.subjects.forEach(subject => {
+                paymentSubjectFilter.innerHTML += `<option value="${subject.name}">${subject.name}</option>`;
+            });
+        }
+
+        // Form submissions
+        document.getElementById('subjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subject = {
+                id: Date.now(),
+                name: document.getElementById('subjectName').value,
+                difficulty: document.getElementById('subjectDifficulty').value,
+                priority: document.getElementById('subjectPriority').value,
+                hours: document.getElementById('subjectHours').value
+            };
+            appData.subjects.push(subject);
+            saveData();
+            updateSubjectsTable();
+            populateSelects();
+            updateStats();
+            closeModal('addSubjectModal');
+        });
+
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const schedule = {
+                id: Date.now(),
+                date: document.getElementById('scheduleDate').value,
+                subject: document.getElementById('scheduleSubject').value,
+                startTime: document.getElementById('scheduleStartTime').value,
+                endTime: document.getElementById('scheduleEndTime').value,
+                breakTime: document.getElementById('scheduleBreak').value
+            };
+            appData.schedule.push(schedule);
+            saveData();
+            updateScheduleTable();
+            updateStats();
+            closeModal('addScheduleModal');
+        });
+
+        document.getElementById('lessonForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const days = Array.from(document.querySelectorAll('.lesson-days:checked')).map(cb => cb.value);
+            const lesson = {
+                id: Date.now(),
+                subject: document.getElementById('lessonSubject').value,
+                teacher: document.getElementById('lessonTeacher').value,
+                location: document.getElementById('lessonLocation').value,
+                days: days,
+                time: document.getElementById('lessonTime').value,
+                amount: document.getElementById('lessonAmount').value
+            };
+            appData.lessons.push(lesson);
+            saveData();
+            updateLessonsTable();
+            updateStats();
+            closeModal('addLessonModal');
+        });
+
+        document.getElementById('timeSlotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const timeSlot = {
+                id: Date.now(),
+                date: document.getElementById('timeSlotDate').value,
+                period: document.getElementById('timeSlotPeriod').value,
+                time: document.getElementById('timeSlotTime').value,
+                activity: document.getElementById('timeSlotActivity').value,
+                completed: false
+            };
+            appData.timeSlots.push(timeSlot);
+            saveData();
+            updateTimeSlotsTable();
+            filterTimeSlots();
+            closeModal('addTimeSlotModal');
+        });
+
+        document.getElementById('websiteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const website = {
+                id: Date.now(),
+                subject: document.getElementById('websiteSubject').value,
+                url: document.getElementById('websiteUrl').value,
+                description: document.getElementById('websiteDescription').value,
+                teacher: document.getElementById('websiteTeacher').value
+            };
+            appData.websites.push(website);
+            saveData();
+            updateWebsitesTable();
+            updateStats();
+            closeModal('addWebsiteModal');
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const payment = {
+                id: Date.now(),
+                date: document.getElementById('paymentDate').value,
+                month: document.getElementById('paymentMonth').value,
+                subject: document.getElementById('paymentSubject').value,
+                teacher: document.getElementById('paymentTeacher').value,
+                amount: parseFloat(document.getElementById('paymentAmount').value),
+                notes: document.getElementById('paymentNotes').value
+            };
+            appData.payments.push(payment);
+            saveData();
+            updatePaymentsTable();
+            updatePaymentStats();
+            updateMonthlyPaymentsSummary();
+            updateStats();
+            closeModal('addPaymentModal');
+        });
+
+        document.getElementById('achievementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const achievement = {
+                id: Date.now(),
+                date: document.getElementById('achievementDate').value,
+                subject: document.getElementById('achievementSubject').value,
+                chapter: document.getElementById('achievementChapter').value,
+                lesson: document.getElementById('achievementLesson').value,
+                book: document.getElementById('achievementBook').value,
+                status: document.getElementById('achievementStatus').value
+            };
+            appData.achievements.push(achievement);
+            saveData();
+            updateAchievementsTable();
+            updateSubjectAchievements();
+            closeModal('addAchievementModal');
+        });
+
+        // Update tables
+        function updateAllTables() {
+            updateSubjectsTable();
+            updateScheduleTable();
+            updateLessonsTable();
+            updateTimeSlotsTable();
+            updateWebsitesTable();
+            updatePaymentsTable();
+            updateAchievementsTable();
+        }
+
+        function updateSubjectsTable() {
+            const tbody = document.getElementById('subjectsTable');
+            tbody.innerHTML = '';
+            appData.subjects.forEach(subject => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${subject.name}</td>
+                        <td>${subject.difficulty}</td>
+                        <td>${subject.priority}</td>
+                        <td>${subject.hours}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editSubject(${subject.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteSubject(${subject.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateScheduleTable() {
+            const tbody = document.getElementById('scheduleTable');
+            tbody.innerHTML = '';
+            appData.schedule.forEach(item => {
+                const date = new Date(item.date);
+                const dayName = date.toLocaleDateString('ar-EG', { weekday: 'long' });
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${dayName}</td>
+                        <td>${item.subject}</td>
+                        <td>${formatTime12Hour(item.startTime)}</td>
+                        <td>${formatTime12Hour(item.endTime)}</td>
+                        <td>${item.breakTime} دقيقة</td>
+                        <td>
+                            <button class="btn-edit" onclick="editSchedule(${item.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteSchedule(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateLessonsTable() {
+            const tbody = document.getElementById('lessonsTable');
+            tbody.innerHTML = '';
+            appData.lessons.forEach(lesson => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${lesson.subject}</td>
+                        <td>${lesson.teacher}</td>
+                        <td>${lesson.location}</td>
+                        <td>${lesson.days.join(', ')}</td>
+                        <td>${formatTime12Hour(lesson.time)}</td>
+                        <td>${lesson.amount} جنيه</td>
+                        <td>
+                            <button class="btn-edit" onclick="editLesson(${lesson.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteLesson(${lesson.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateTimeSlotsTable() {
+            const tbody = document.getElementById('timeSlotsTable');
+            tbody.innerHTML = '';
+            appData.timeSlots.forEach(slot => {
+                const date = new Date(slot.date);
+                const dayName = date.toLocaleDateString('ar-EG', { weekday: 'long' });
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${slot.date}</td>
+                        <td>${dayName}</td>
+                        <td>${slot.period}</td>
+                        <td>${formatTime12Hour(slot.time)}</td>
+                        <td>${slot.activity}</td>
+                        <td>
+                            <input type="checkbox" ${slot.completed ? 'checked' : ''} 
+                                   onchange="toggleTimeSlotCompletion(${slot.id})">
+                            ${slot.completed ? 'تم التنفيذ' : 'لم يتم'}
+                        </td>
+                        <td>
+                            <button class="btn-edit" onclick="editTimeSlot(${slot.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteTimeSlot(${slot.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateWebsitesTable() {
+            const tbody = document.getElementById('websitesTable');
+            tbody.innerHTML = '';
+            appData.websites.forEach(website => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${website.subject}</td>
+                        <td><a href="${website.url}" target="_blank" class="text-blue-600">${website.url}</a></td>
+                        <td>${website.description}</td>
+                        <td>${website.teacher}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editWebsite(${website.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteWebsite(${website.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updatePaymentsTable() {
+            const tbody = document.getElementById('paymentsTable');
+            tbody.innerHTML = '';
+            let filteredPayments = appData.payments;
+            
+            // Apply filters
+            const monthFilter = document.getElementById('paymentMonthFilter').value;
+            const yearFilter = document.getElementById('paymentYearFilter').value;
+            const subjectFilter = document.getElementById('paymentSubjectFilter').value;
+            
+            if (monthFilter || yearFilter || subjectFilter) {
+                filteredPayments = appData.payments.filter(payment => {
+                    const paymentDate = new Date(payment.date);
+                    const matchMonth = !monthFilter || payment.month === monthFilter;
+                    const matchYear = !yearFilter || paymentDate.getFullYear().toString() === yearFilter;
+                    const matchSubject = !subjectFilter || payment.subject === subjectFilter;
+                    return matchMonth && matchYear && matchSubject;
+                });
+            }
+            
+            filteredPayments.forEach(payment => {
+                const months = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                               'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${payment.date}</td>
+                        <td>${months[parseInt(payment.month)]}</td>
+                        <td>${payment.subject}</td>
+                        <td>${payment.teacher}</td>
+                        <td>${payment.amount} جنيه</td>
+                        <td>${payment.notes || '-'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editPayment(${payment.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deletePayment(${payment.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateAchievementsTable() {
+            const tbody = document.getElementById('achievementsTable');
+            tbody.innerHTML = '';
+            appData.achievements.forEach(achievement => {
+                const date = new Date(achievement.date);
+                const dayName = date.toLocaleDateString('ar-EG', { weekday: 'long' });
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${achievement.date}</td>
+                        <td>${dayName}</td>
+                        <td>${achievement.subject}</td>
+                        <td>${achievement.chapter}</td>
+                        <td>${achievement.lesson}</td>
+                        <td>${achievement.book}</td>
+                        <td>
+                            <span class="px-2 py-1 rounded text-white ${getStatusColor(achievement.status)}">
+                                ${achievement.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-edit" onclick="editAchievement(${achievement.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteAchievement(${achievement.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Helper functions
+        function formatTime12Hour(time24) {
+            const [hours, minutes] = time24.split(':');
+            const hour12 = parseInt(hours) % 12 || 12;
+            const ampm = parseInt(hours) >= 12 ? 'م' : 'ص';
+            return `${hour12}:${minutes} ${ampm}`;
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'تم المذاكرة': return 'bg-green-500';
+                case 'تم المراجعة': return 'bg-blue-500';
+                case 'مؤجل': return 'bg-red-500';
+                default: return 'bg-gray-500';
+            }
+        }
+
+        // Delete functions
+        function deleteSubject(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المادة؟')) {
+                appData.subjects = appData.subjects.filter(s => s.id !== id);
+                saveData();
+                updateSubjectsTable();
+                populateSelects();
+                updateStats();
+            }
+        }
+
+        function deleteSchedule(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الجلسة؟')) {
+                appData.schedule = appData.schedule.filter(s => s.id !== id);
+                saveData();
+                updateScheduleTable();
+                updateStats();
+            }
+        }
+
+        function deleteLesson(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الدرس؟')) {
+                appData.lessons = appData.lessons.filter(l => l.id !== id);
+                saveData();
+                updateLessonsTable();
+                updateStats();
+            }
+        }
+
+        function deleteTimeSlot(id) {
+            if (confirm('هل أنت متأكد من حذف هذا النشاط؟')) {
+                appData.timeSlots = appData.timeSlots.filter(t => t.id !== id);
+                saveData();
+                updateTimeSlotsTable();
+                filterTimeSlots();
+            }
+        }
+
+        function deleteWebsite(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الموقع؟')) {
+                appData.websites = appData.websites.filter(w => w.id !== id);
+                saveData();
+                updateWebsitesTable();
+                updateStats();
+            }
+        }
+
+        function deletePayment(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الدفعة؟')) {
+                appData.payments = appData.payments.filter(p => p.id !== id);
+                saveData();
+                updatePaymentsTable();
+                updatePaymentStats();
+                updateMonthlyPaymentsSummary();
+                updateStats();
+            }
+        }
+
+        function deleteAchievement(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الإنجاز؟')) {
+                appData.achievements = appData.achievements.filter(a => a.id !== id);
+                saveData();
+                updateAchievementsTable();
+                updateSubjectAchievements();
+            }
+        }
+
+        // Edit functions (simplified - just alert for now)
+        function editSubject(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editSchedule(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editLesson(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editTimeSlot(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editWebsite(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editPayment(id) { alert('ميزة التعديل قيد التطوير'); }
+        function editAchievement(id) { alert('ميزة التعديل قيد التطوير'); }
+
+        // Toggle time slot completion
+        function toggleTimeSlotCompletion(id) {
+            const slot = appData.timeSlots.find(s => s.id === id);
+            if (slot) {
+                slot.completed = !slot.completed;
+                saveData();
+                updateTimeSlotsTable();
+            }
+        }
+
+        // Filter time slots
+        function filterTimeSlots() {
+            const selectedDate = document.getElementById('timeManagementDate').value;
+            if (!selectedDate) return;
+            
+            const filteredSlots = appData.timeSlots.filter(slot => slot.date === selectedDate);
+            
+            // Group by period
+            const periods = {
+                'صباحية': filteredSlots.filter(s => s.period === 'صباحية'),
+                'ظهيرة': filteredSlots.filter(s => s.period === 'ظهيرة'),
+                'مسائية': filteredSlots.filter(s => s.period === 'مسائية')
+            };
+            
+            // Update period displays
+            document.getElementById('morningSlots').innerHTML = periods['صباحية'].map(s => 
+                `<div class="text-sm ${s.completed ? 'text-green-600' : 'text-gray-600'}">${formatTime12Hour(s.time)} - ${s.activity}</div>`
+            ).join('');
+            
+            document.getElementById('afternoonSlots').innerHTML = periods['ظهيرة'].map(s => 
+                `<div class="text-sm ${s.completed ? 'text-green-600' : 'text-gray-600'}">${formatTime12Hour(s.time)} - ${s.activity}</div>`
+            ).join('');
+            
+            document.getElementById('eveningSlots').innerHTML = periods['مسائية'].map(s => 
+                `<div class="text-sm ${s.completed ? 'text-green-600' : 'text-gray-600'}">${formatTime12Hour(s.time)} - ${s.activity}</div>`
+            ).join('');
+        }
+
+        // Update payment statistics
+        function updatePaymentStats() {
+            const currentDate = new Date();
+            const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const currentYear = currentDate.getFullYear();
+            const lastMonth = currentDate.getMonth() === 0 ? '12' : String(currentDate.getMonth()).padStart(2, '0');
+            
+            // Current month total
+            const currentMonthPayments = appData.payments.filter(p => {
+                const paymentDate = new Date(p.date);
+                return p.month === currentMonth && paymentDate.getFullYear() === currentYear;
+            });
+            const currentMonthTotal = currentMonthPayments.reduce((sum, p) => sum + p.amount, 0);
+            
+            // Last month total
+            const lastMonthPayments = appData.payments.filter(p => {
+                return p.month === lastMonth;
+            });
+            const lastMonthTotal = lastMonthPayments.reduce((sum, p) => sum + p.amount, 0);
+            
+            // Yearly total
+            const yearlyPayments = appData.payments.filter(p => {
+                const paymentDate = new Date(p.date);
+                return paymentDate.getFullYear() === currentYear;
+            });
+            const yearlyTotal = yearlyPayments.reduce((sum, p) => sum + p.amount, 0);
+            
+            // Average monthly
+            const monthsWithPayments = [...new Set(appData.payments.map(p => `${new Date(p.date).getFullYear()}-${p.month}`))];
+            const averageMonthly = monthsWithPayments.length > 0 ? Math.round(yearlyTotal / monthsWithPayments.length) : 0;
+            
+            document.getElementById('currentMonthTotal').textContent = currentMonthTotal;
+            document.getElementById('lastMonthTotal').textContent = lastMonthTotal;
+            document.getElementById('yearlyTotal').textContent = yearlyTotal;
+            document.getElementById('averageMonthly').textContent = averageMonthly;
+        }
+
+        // Update monthly payments summary
+        function updateMonthlyPaymentsSummary() {
+            const monthlyData = {};
+            const months = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                           'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            
+            appData.payments.forEach(payment => {
+                const year = new Date(payment.date).getFullYear();
+                const key = `${year}-${payment.month}`;
+                
+                if (!monthlyData[key]) {
+                    monthlyData[key] = {
+                        year: year,
+                        month: payment.month,
+                        count: 0,
+                        total: 0
+                    };
+                }
+                monthlyData[key].count++;
+                monthlyData[key].total += payment.amount;
+            });
+            
+            const tbody = document.getElementById('monthlyPaymentsSummary');
+            tbody.innerHTML = '';
+            
+            Object.values(monthlyData)
+                .sort((a, b) => b.year - a.year || b.month - a.month)
+                .forEach(data => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${months[parseInt(data.month)]}</td>
+                            <td>${data.year}</td>
+                            <td>${data.count}</td>
+                            <td>${data.total} جنيه</td>
+                        </tr>
+                    `;
+                });
+        }
+
+        // Filter payments
+        function filterPayments() {
+            updatePaymentsTable();
+        }
+
+        // Update subject achievements
+        function updateSubjectAchievements() {
+            const achievementsBySubject = {};
+            
+            appData.achievements.forEach(achievement => {
+                if (!achievementsBySubject[achievement.subject]) {
+                    achievementsBySubject[achievement.subject] = {
+                        total: 0,
+                        completed: 0,
+                        reviewed: 0,
+                        pending: 0
+                    };
+                }
+                
+                achievementsBySubject[achievement.subject].total++;
+                
+                switch (achievement.status) {
+                    case 'تم المذاكرة':
+                        achievementsBySubject[achievement.subject].completed++;
+                        break;
+                    case 'تم المراجعة':
+                        achievementsBySubject[achievement.subject].reviewed++;
+                        break;
+                    case 'مؤجل':
+                        achievementsBySubject[achievement.subject].pending++;
+                        break;
+                }
+            });
+            
+            const container = document.getElementById('subjectAchievements');
+            container.innerHTML = '';
+            
+            Object.entries(achievementsBySubject).forEach(([subject, stats]) => {
+                const completionRate = Math.round((stats.completed / stats.total) * 100) || 0;
+                container.innerHTML += `
+                    <div class="stats-card">
+                        <h4 class="font-bold text-lg mb-2">${subject}</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>المذاكرة: <span class="text-green-600 font-bold">${stats.completed}</span></div>
+                            <div>المراجعة: <span class="text-blue-600 font-bold">${stats.reviewed}</span></div>
+                            <div>المؤجل: <span class="text-red-600 font-bold">${stats.pending}</span></div>
+                            <div>الإجمالي: <span class="text-gray-600 font-bold">${stats.total}</span></div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="text-xs text-gray-500">معدل الإكمال</div>
+                            <div class="text-xl font-bold text-purple-600">${completionRate}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Update general statistics
+        function updateStats() {
+            document.getElementById('totalSubjects').textContent = appData.subjects.length;
+            document.getElementById('totalLessons').textContent = appData.lessons.length;
+            
+            // Calculate total study hours
+            let totalHours = 0;
+            appData.schedule.forEach(item => {
+                const start = new Date(`2000-01-01 ${item.startTime}`);
+                const end = new Date(`2000-01-01 ${item.endTime}`);
+                const hours = (end - start) / (1000 * 60 * 60);
+                totalHours += hours;
+            });
+            document.getElementById('totalStudyHours').textContent = Math.round(totalHours);
+            
+            // Monthly payments
+            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+            const monthlyTotal = appData.payments
+                .filter(p => p.month === currentMonth)
+                .reduce((sum, p) => sum + p.amount, 0);
+            document.getElementById('monthlyPayments').textContent = monthlyTotal;
+            
+            // Update report stats
+            document.getElementById('totalStudyHoursReport').textContent = Math.round(totalHours);
+            document.getElementById('completedLessons').textContent = appData.achievements.filter(a => a.status === 'تم المذاكرة').length;
+            document.getElementById('totalExpenses').textContent = appData.payments.reduce((sum, p) => sum + p.amount, 0);
+            document.getElementById('totalWebsites').textContent = appData.websites.length;
+            
+            const achievementRate = appData.achievements.length > 0 ? 
+                Math.round((appData.achievements.filter(a => a.status !== 'مؤجل').length / appData.achievements.length) * 100) : 0;
+            document.getElementById('achievementRate').textContent = `${achievementRate}%`;
+        }
+
+        // Prayer times functions
+        function calculatePrayerTimes() {
+            // Simple calculation for Egypt (Cairo)
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Check if custom prayer times are set
+            if (appData.settings.prayerMode === 'manual' && appData.settings.customPrayerTimes) {
+                const custom = appData.settings.customPrayerTimes;
+                return {
+                    fajr: custom.fajr || '04:30',
+                    sunrise: custom.sunrise || '06:00',
+                    dhuhr: custom.dhuhr || '12:15',
+                    asr: custom.asr || '15:45',
+                    maghrib: custom.maghrib || '18:30',
+                    isha: custom.isha || '20:00'
+                };
+            }
+            
+            // Automatic calculation (simplified)
+            return {
+                fajr: '04:30',
+                sunrise: '06:00',
+                dhuhr: '12:15',
+                asr: '15:45',
+                maghrib: '18:30',
+                isha: '20:00'
+            };
+        }
+
+        function updatePrayerTimes() {
+            const times = calculatePrayerTimes();
+            const prayers = [
+                { name: 'الفجر', time: times.fajr, icon: 'fas fa-sun' },
+                { name: 'الشروق', time: times.sunrise, icon: 'fas fa-sunrise' },
+                { name: 'الظهر', time: times.dhuhr, icon: 'fas fa-sun' },
+                { name: 'العصر', time: times.asr, icon: 'fas fa-cloud-sun' },
+                { name: 'المغرب', time: times.maghrib, icon: 'fas fa-sunset' },
+                { name: 'العشاء', time: times.isha, icon: 'fas fa-moon' }
+            ];
+            
+            // Update prayer times grid
+            const grid = document.getElementById('prayerTimesGrid');
+            const todayGrid = document.getElementById('prayerTimesToday');
+            
+            let gridHTML = '';
+            let todayHTML = '';
+            
+            prayers.forEach((prayer, index) => {
+                const isNext = isNextPrayer(prayer.time);
+                const cardClass = isNext ? 'prayer-time-next' : 'prayer-card';
+                
+                const prayerCard = `
+                    <div class="${cardClass}">
+                        <div class="text-center">
+                            <i class="${prayer.icon} text-2xl mb-2"></i>
+                            <h4 class="font-bold">${prayer.name}</h4>
+                            <div class="text-xl font-bold">${formatTime12Hour(prayer.time)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                gridHTML += prayerCard;
+                todayHTML += prayerCard;
+            });
+            
+            grid.innerHTML = gridHTML;
+            todayGrid.innerHTML = todayHTML;
+            
+            updateNextPrayerCountdown();
+        }
+
+        function isNextPrayer(prayerTime) {
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const [hours, minutes] = prayerTime.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
+            
+            return prayerMinutes > currentTime;
+        }
+
+        function updateNextPrayerCountdown() {
+            const times = calculatePrayerTimes();
+            const prayers = [
+                { name: 'الفجر', time: times.fajr },
+                { name: 'الشروق', time: times.sunrise },
+                { name: 'الظهر', time: times.dhuhr },
+                { name: 'العصر', time: times.asr },
+                { name: 'المغرب', time: times.maghrib },
+                { name: 'العشاء', time: times.isha }
+            ];
+            
+            const now = new Date();
+            let nextPrayer = null;
+            
+            for (const prayer of prayers) {
+                const [hours, minutes] = prayer.time.split(':').map(Number);
+                const prayerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                
+                if (prayerTime > now) {
+                    nextPrayer = { ...prayer, time: prayerTime };
+                    break;
+                }
+            }
+            
+            if (!nextPrayer) {
+                // Next prayer is Fajr of tomorrow
+                const [hours, minutes] = times.fajr.split(':').map(Number);
+                const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours, minutes);
+                nextPrayer = { name: 'الفجر', time: tomorrow };
+            }
+            
+            if (nextPrayer) {
+                const timeDiff = nextPrayer.time - now;
+                const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+                const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('nextPrayerCountdown').textContent = 
+                    `${nextPrayer.name} خلال ${hoursLeft} ساعة و ${minutesLeft} دقيقة`;
+            }
+        }
+
+        function togglePrayerInputs() {
+            const mode = document.getElementById('prayerMode').value;
+            const inputs = document.getElementById('manualPrayerInputs');
+            inputs.style.display = mode === 'manual' ? 'block' : 'none';
+        }
+
+        document.getElementById('prayerSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            appData.settings.prayerMode = document.getElementById('prayerMode').value;
+            
+            if (appData.settings.prayerMode === 'manual') {
+                appData.settings.customPrayerTimes = {
+                    fajr: document.getElementById('customFajr').value,
+                    sunrise: document.getElementById('customSunrise').value,
+                    dhuhr: document.getElementById('customDhuhr').value,
+                    asr: document.getElementById('customAsr').value,
+                    maghrib: document.getElementById('customMaghrib').value,
+                    isha: document.getElementById('customIsha').value
+                };
+            }
+            
+            saveData();
+            updatePrayerTimes();
+            closeModal('prayerSettingsModal');
+        });
+
+        // Data export/import functions
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `smart-study-app-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        appData = {...appData, ...importedData};
+                        saveData();
+                        location.reload();
+                    } catch (error) {
+                        alert('خطأ في قراءة الملف');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function resetAllData() {
+            if (confirm('هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsonrqPRouaXA7D6bmPnkfvHrweoQ%2B4w9QdAeJJfAiMFQEa7JBWi%2BWdy3V6NfguH1%2BrqZX8NVgqXBdh3PhiiEnPmeWXz7%2ById0xuFNuw32vSytb8df1LbjEuCfAvQdPH0N0JZ0TDUK7tWXkbUhtsJi4Hz5VbmThA9DqUyf3Cp3w2lMTTQz3%2FB3UDRCFnDkYp5Z5MGtqYm7193zLyGsIPsSW3RpOAcxj4pP3q08BqG5vuvq0%2F67N0GdssRNTeUqXTI8ApwCiU60ei9RbMBDnEgQk7e58I03tn2Z3SkuaMHgPyT6J0pWl%2BVRXTDy%2BeQImGGxsLpq65vrm3pKafiKKOqx5ReFnBGweCxZFHCvvI1fIpGPWgNBrSgCMVnoxaHS5%2Fx6BaVI8Mfxn4NF4CReSCxw%2BgldZY2hpS5Ryytd6d5L%2F9l4zS9VjBBXrAIYoUQkDCOEVSB47rmqbpZCDHdd0YQ3s%2F%2FzeSZyMNHu1rBBVoOSqc";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsonrqPRouaXA7D6bmPnkfvHrweoQ+4w9QdAeJJfAiMFQEa7JBWi+Wdy3V6NfguH1+rqZX8NVgqXBdh3PhiiEnPmeWXz7+yId0xuFNuw32vSytb8df1LbjEuCfAvQdPH0N0JZ0TDUK7tWXkbUhtsJi4Hz5VbmThA9DqUyf3Cp3w2lMTTQz3/B3UDRCFnDkYp5Z5MGtqYm7193zLyGsIPsSW3RpOAcxj4pP3q08BqG5vuvq0/67N0GdssRNTeUqXTI8ApwCiU60ei9RbMBDnEgQk7e58I03tn2Z3SkuaMHgPyT6J0pWl+VRXTDy+eQImGGxsLpq65vrm3pKafiKKOqx5ReFnBGweCxZFHCvvI1fIpGPWgNBrSgCMVnoxaHS5/x6BaVI8Mfxn4NF4CReSCxw+gldZY2hpS5Ryytd6d5L/9l4zS9VjBBXrAIYoUQkDCOEVSB47rmqbpZCDHdd0YQ3s//zeSZyMNHu1rBBVoOSqc";
+    </script>
+    
+        <script id="html_badge_script2" src="https://www.genspark.ai/html_badge.js"></script>
+        
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
